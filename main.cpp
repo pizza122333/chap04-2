@@ -1,0 +1,44 @@
+#include <iostream>
+#include <opencv2/opencv.hpp>
+
+using namespace cv;
+using namespace std;
+
+int main(void)
+{
+    // 1. 동영상 파일 열기
+    VideoCapture cap("stopwatch.avi");
+    if (!cap.isOpened()) {
+        cerr << "Video open failed!" << endl;
+        return -1;
+    }
+
+    // 비디오 정보 출력
+    double fps = cap.get(CAP_PROP_FPS);
+    int delay = cvRound(1000 / fps);
+
+    Mat frame, brightened;
+
+    while (true) {
+        // 2. 프레임 읽기
+        cap >> frame;
+        if (frame.empty()) break;
+
+        // 3. R, G, B 값을 모두 100만큼 증가 (포화 연산 적용)
+        // Scalar(100, 100, 100)을 더하면 BGR 각 채널에 100이 더해집니다.
+        brightened = frame + Scalar(100, 100, 100);
+
+        // 4. 원본 영상과 처리 후 결과 영상 출력
+        imshow("Original Frame", frame);
+        imshow("Brightened Frame", brightened);
+
+        // 5. 'q' 또는 'Q' 키를 누르면 종료 (ESC는 27)
+        int key = waitKey(delay);
+        if (key == 'q' || key == 'Q') {
+            break;
+        }
+    }
+
+    destroyAllWindows();
+    return 0;
+}
